@@ -1,123 +1,83 @@
 <template>
-  <div class="container">
-    <h1>🎬 Gerador de Citações Aleatórias</h1>
+  <div>
+    <h1>Minhas Tarefas</h1>
     
-    <div class="quote-box">
-      <p class="quote-text">{{ quotaAtual.texto }}</p>
-      <p class="quote-author">— {{ quotaAtual.autor }}</p>
-    </div>
+    <input
+      v-model="novaTarefa"
+      type="text"
+      placeholder="Digite uma tarefa..."
+      @keyup.enter="adicionarTarefa"
+    />
+    <button @click="adicionarTarefa">Adicionar</button>
 
-    <button @click="gerarNovaQuota" class="btn">
-      Próxima Citação
-    </button>
-
-    <div class="stats">
-      <p>Citações vistas: {{ contagem }}</p>
-    </div>
+    <ul>
+      <li v-for="tarefa in tarefas" :key="tarefa.id">
+        <span
+          @click="alternarConcluida(tarefa.id)"
+          :class="{ riscado: tarefa.concluida }"
+        >
+          {{ tarefa.texto }}
+        </span>
+        <button @click="removerTarefa(tarefa.id)">Remover</button>
+      </li>
+    </ul>
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
+<script>
+export default {
+  data() {
+    return {
+      novaTarefa: '',
+      tarefas: [],
+      proximoId: 1,
+    };
+  },
+  methods: {
+    adicionarTarefa() {
+      if (this.novaTarefa.trim() === '') return;
 
-const quotas = [
-  { texto: "A vida é 10% do que acontece com você e 90% de como você reage.", autor: "Charles R. Swindoll" },
-  { texto: "O único jeito de fazer um grande trabalho é amar o que você faz.", autor: "Steve Jobs" },
-  { texto: "Inovação distingue um líder de um seguidor.", autor: "Steve Jobs" },
-  { texto: "A criatividade é a inteligência se divertindo.", autor: "Albert Einstein" },
-  { texto: "Você não pode crescer sem sair da sua zona de conforto.", autor: "Stephen Covey" },
-  { texto: "Sucesso é a soma de pequenos esforços repetidos dia após dia.", autor: "Robert Collier" },
-  { texto: "Não há atalhos para qualquer lugar que valha a pena ir.", autor: "Beverly Sills" },
-  { texto: "Acredite em si mesmo. Você é mais capaz do que pensa.", autor: "Benjamin Franklin" }
-]
+      this.tarefas.push({
+        id: this.proximoId++,
+        texto: this.novaTarefa,
+        concluida: false,
+      });
 
-const contagem = ref(0)
-const quotaAtual = ref(quotas[0])
-
-const gerarNovaQuota = () => {
-  const indice = Math.floor(Math.random() * quotas.length)
-  quotaAtual.value = quotas[indice]
-  contagem.value++
-}
+      this.novaTarefa = '';
+    },
+    alternarConcluida(id) {
+      const tarefa = this.tarefas.find(t => t.id === id);
+      if (tarefa) tarefa.concluida = !tarefa.concluida;
+    },
+    removerTarefa(id) {
+      this.tarefas = this.tarefas.filter(t => t.id !== id);
+    },
+  },
+};
 </script>
 
 <style scoped>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+input {
+  padding: 8px;
+  margin-right: 10px;
 }
 
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+button {
+  padding: 8px 12px;
 }
 
-.container {
-  background: white;
-  padding: 50px;
-  border-radius: 20px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  max-width: 600px;
-  text-align: center;
+li {
+  list-style: none;
+  margin: 10px 0;
 }
 
-h1 {
-  color: #333;
-  margin-bottom: 40px;
-  font-size: 28px;
-}
-
-.quote-box {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 40px;
-  border-radius: 15px;
-  margin-bottom: 30px;
-  min-height: 200px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.quote-text {
-  font-size: 20px;
-  font-weight: 500;
-  margin-bottom: 20px;
-  line-height: 1.6;
-}
-
-.quote-author {
-  font-size: 16px;
-  opacity: 0.9;
-  font-style: italic;
-}
-
-.btn {
-  background: #667eea;
-  color: white;
-  border: none;
-  padding: 15px 40px;
-  font-size: 16px;
-  border-radius: 10px;
+span {
   cursor: pointer;
-  font-weight: bold;
-  transition: 0.3s;
+  margin-right: 10px;
 }
 
-.btn:hover {
-  background: #764ba2;
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
-}
-
-.stats {
-  margin-top: 30px;
-  color: #666;
-  font-size: 14px;
+.riscado {
+  text-decoration: line-through;
+  color: gray;
 }
 </style>
